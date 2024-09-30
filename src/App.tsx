@@ -1,19 +1,30 @@
 import "./App.css";
+import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Camera } from "./Camera";
-
-// TODO:
-// Test function to snap a cube to the mouse - rounded to the nearst 1 or something
-// Looking at the demo videos, I think the snapping is to be at the line intersections! ... nice and easy
-
-// Import the spaceship to scale, have it follow the camera's x and z position (lerping?)
-// Probably before that make it so wasd controls cameras x and z position
+import { GuideLines } from "./GuideLines";
+import { ReferenceSphere } from "./ReferenceSphere";
 
 function App() {
+  const [isDrawingLine, setIsDrawingLine] = useState(false);
+
+  const drawLineButton = () => {
+    setIsDrawingLine(!isDrawingLine);
+  };
+
   return (
-    <Canvas>
-      <Camera />
-    </Canvas>
+    <>
+      <Canvas>
+        <Camera />
+        <GuideLines />
+        <ReferenceSphere isEnabled={isDrawingLine} />
+      </Canvas>
+      <div style={{ display: "flex", marginTop: "10px" }}>
+        <button onClick={drawLineButton}>
+          {isDrawingLine ? "Complete Line" : "Start New Line"}
+        </button>
+      </div>
+    </>
   );
 }
 

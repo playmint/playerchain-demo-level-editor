@@ -15,6 +15,7 @@ export function Camera() {
     y: number;
   } | null>(null);
   const [isShiftDown, setIsShiftDown] = useState(false);
+  const [cursorStyle, setCursorStyle] = useState("crosshair");
 
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
@@ -105,6 +106,22 @@ export function Camera() {
     (camera as THREE.OrthographicCamera).zoom = currentZoom;
     camera.updateProjectionMatrix();
   }, [currentZoom, camera]);
+
+  useEffect(() => {
+    gl.domElement.style.cursor = cursorStyle;
+  }, [cursorStyle, gl.domElement.style]);
+
+  useEffect(() => {
+    if (isShiftDown) {
+      if (isDragging) {
+        setCursorStyle("grabbing");
+      } else {
+        setCursorStyle("grab");
+      }
+    } else {
+      setCursorStyle("crosshair");
+    }
+  }, [isDragging, isShiftDown]);
 
   return (
     <>
