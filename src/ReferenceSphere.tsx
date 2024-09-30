@@ -1,9 +1,15 @@
-export function ReferenceSphere({ isEnabled }: { isEnabled: boolean }) {
+export function ReferenceSphere({
+  isEnabled,
+  position,
+}: {
+  isEnabled: boolean;
+  position: [number, number, number];
+}) {
   return (
     <>
       {isEnabled && (
-        <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[0.5, 32, 32]} />
+        <mesh position={position}>
+          <sphereGeometry args={[2.5, 32, 32]} />
           <meshBasicMaterial color="white" />
         </mesh>
       )}
