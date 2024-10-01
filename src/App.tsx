@@ -1,10 +1,11 @@
 import "./App.css";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { Camera } from "./Camera";
 import { GuideLines } from "./GuideLines";
 import { ReferenceSphere } from "./ReferenceSphere";
 import { LineRenderer } from "./LineRenderer";
+import Overlay from "./Overlay";
 import * as THREE from "three";
 
 function App() {
@@ -19,7 +20,10 @@ function App() {
   // State for the current line being drawn
   const [currentLine, setCurrentLine] = useState<THREE.Vector3[]>([]);
 
-  const drawLineButton = () => {
+  // State to track which line is being hovered over
+  const [hoveredLineIndex, setHoveredLineIndex] = useState<number | null>(null);
+
+  const drawLineButton = useCallback(() => {
     if (isDrawingLine) {
       // Complete the current line
       setIsDrawingLine(false);
@@ -33,7 +37,41 @@ function App() {
       setIsDrawingLine(true);
       setCurrentLine([]);
     }
+  }, [isDrawingLine, currentLine]);
+
+  const deleteLine = (index: number) => {
+    setLines((prevLines) => prevLines.filter((_, i) => i !== index));
   };
+
+  const undoLastPoint = useCallback(() => {
+    if (isDrawingLine && currentLine.length > 0) {
+      setCurrentLine((prev) => prev.slice(0, -1));
+    }
+  }, [isDrawingLine, currentLine]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isDrawingLine) {
+        if (event.key === "n") {
+          drawLineButton();
+        }
+      } else {
+        if (event.key === "Enter") {
+          drawLineButton();
+        } else if (event.key === "Escape" || event.key === "n") {
+          setIsDrawingLine(false);
+          setCurrentLine([]);
+        } else if (event.key === "z") {
+          undoLastPoint();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [drawLineButton, isDrawingLine, undoLastPoint]);
 
   return (
     <>
@@ -50,16 +88,37 @@ function App() {
         )}
         <ReferenceSphere isEnabled={isDrawingLine} position={mouseWorldPos} />
         {lines.map((linePoints, index) => (
-          <LineRenderer key={index} points={linePoints} />
+          <LineRenderer
+            key={index}
+            points={linePoints}
+            color={hoveredLineIndex === index ? "yellow" : "white"}
+          />
         ))}
         {isDrawingLine && currentLine.length > 0 && (
-          <LineRenderer points={currentLine} />
+          <LineRenderer
+            points={[...currentLine, new THREE.Vector3(...mouseWorldPos)]}
+            color="grey"
+          />
         )}
       </Canvas>
-      <div style={{ display: "flex", marginTop: "10px" }}>
-        <button onClick={drawLineButton}>
-          {isDrawingLine ? "Complete Line" : "Start New Line"}
+      <Overlay mouseWorldPos={mouseWorldPos} isDrawingLine={isDrawingLine} />
+      <div className="container">
+        <button className="button" onClick={drawLineButton}>
+          {isDrawingLine ? "[Enter] Complete Line" : "[n] Start New Line"}
         </button>
+        {lines.map((_line, index) => (
+          <div
+            key={index}
+            className="row"
+            onMouseEnter={() => setHoveredLineIndex(index)}
+            onMouseLeave={() => setHoveredLineIndex(null)}
+          >
+            <span>Line {index + 1}</span>
+            <button className="delete-button" onClick={() => deleteLine(index)}>
+              Delete
+            </button>
+          </div>
+        ))}
       </div>
     </>
   );
@@ -87,6 +146,7 @@ function PointerMovePlane({
   };
 
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
+    if (event.shiftKey) return; // Ignore if shift key is held down
     event.stopPropagation(); // Prevent the event from bubbling up
     const point = event.point;
 

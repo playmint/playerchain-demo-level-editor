@@ -9,7 +9,7 @@ export function ReferenceSphere({
     <>
       {isEnabled && (
         <mesh position={position}>
-          <sphereGeometry args={[2.5, 32, 32]} />
+          <boxGeometry args={[2, 2, 2]} />
           <meshBasicMaterial color="white" />
         </mesh>
       )}
