@@ -5,7 +5,9 @@ import { Camera } from "./Camera";
 import { GuideLines } from "./GuideLines";
 import { ReferenceSphere } from "./ReferenceSphere";
 import { LineRenderer } from "./LineRenderer";
+import { ReferenceShip } from "./ReferenceShip";
 import Overlay from "./Overlay";
+import ExportLevel from "./ExportLevel";
 import * as THREE from "three";
 
 function App() {
@@ -14,26 +16,29 @@ function App() {
     0, 0, 0,
   ]);
 
-  // State to hold all lines (each line is an array of Vector3 points)
   const [lines, setLines] = useState<THREE.Vector3[][]>([]);
-
-  // State for the current line being drawn
   const [currentLine, setCurrentLine] = useState<THREE.Vector3[]>([]);
-
-  // State to track which line is being hovered over
   const [hoveredLineIndex, setHoveredLineIndex] = useState<number | null>(null);
+  const [cubeWidth, setCubeWidth] = useState(4);
+  const [mirrorAllQuadrants, setMirrorAllQuadrants] = useState(false);
+
+  const incrementCubeWidth = useCallback(
+    () => setCubeWidth(cubeWidth + 0.5),
+    [cubeWidth]
+  );
+  const decrementCubeWidth = useCallback(
+    () => setCubeWidth(Math.max(0.5, cubeWidth - 0.5)),
+    [cubeWidth]
+  );
 
   const drawLineButton = useCallback(() => {
     if (isDrawingLine) {
-      // Complete the current line
       setIsDrawingLine(false);
       if (currentLine.length > 0) {
-        // Add the current line to the collection of lines
         setLines((prevLines) => [...prevLines, currentLine]);
         setCurrentLine([]);
       }
     } else {
-      // Start a new line
       setIsDrawingLine(true);
       setCurrentLine([]);
     }
@@ -65,13 +70,56 @@ function App() {
           undoLastPoint();
         }
       }
+
+      if (event.key === "[") {
+        decrementCubeWidth();
+      } else if (event.key === "]") {
+        incrementCubeWidth();
+      }
+    };
+
+    const handleContextMenu = (event: MouseEvent) => {
+      event.preventDefault();
+      if (isDrawingLine) {
+        setIsDrawingLine(false);
+        setCurrentLine([]);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("contextmenu", handleContextMenu);
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("contextmenu", handleContextMenu);
     };
-  }, [drawLineButton, isDrawingLine, undoLastPoint]);
+  }, [
+    decrementCubeWidth,
+    drawLineButton,
+    incrementCubeWidth,
+    isDrawingLine,
+    undoLastPoint,
+  ]);
+
+  const getMirroredLinesAllQuadrants = () => {
+    const mirroredLines: THREE.Vector3[][] = [];
+
+    lines.forEach((line) => {
+      const mirroredLineX = line.map(
+        (point) => new THREE.Vector3(-point.x, point.y, point.z)
+      );
+      const mirroredLineY = line.map(
+        (point) => new THREE.Vector3(point.x, -point.y, point.z)
+      );
+      const mirroredLineXY = line.map(
+        (point) => new THREE.Vector3(-point.x, -point.y, point.z)
+      );
+
+      mirroredLines.push(line, mirroredLineX, mirroredLineY, mirroredLineXY);
+    });
+
+    return mirroredLines;
+  };
 
   return (
     <>
@@ -86,7 +134,11 @@ function App() {
             }
           />
         )}
-        <ReferenceSphere isEnabled={isDrawingLine} position={mouseWorldPos} />
+        <ReferenceSphere
+          isEnabled={isDrawingLine}
+          position={mouseWorldPos}
+          thickness={cubeWidth}
+        />
         {lines.map((linePoints, index) => (
           <LineRenderer
             key={index}
@@ -94,31 +146,81 @@ function App() {
             color={hoveredLineIndex === index ? "yellow" : "white"}
           />
         ))}
+        {mirrorAllQuadrants &&
+          getMirroredLinesAllQuadrants().map((linePoints, index) => (
+            <LineRenderer
+              key={`mirror-${index}`}
+              points={linePoints}
+              color={
+                index % 4 === 0
+                  ? "white"
+                  : index % 4 === 1
+                  ? "red"
+                  : index % 4 === 2
+                  ? "green"
+                  : "blue"
+              }
+            />
+          ))}
         {isDrawingLine && currentLine.length > 0 && (
           <LineRenderer
             points={[...currentLine, new THREE.Vector3(...mouseWorldPos)]}
             color="grey"
           />
         )}
+        <ReferenceShip />
       </Canvas>
       <Overlay mouseWorldPos={mouseWorldPos} isDrawingLine={isDrawingLine} />
-      <div className="container">
-        <button className="button" onClick={drawLineButton}>
-          {isDrawingLine ? "[Enter] Complete Line" : "[n] Start New Line"}
-        </button>
-        {lines.map((_line, index) => (
-          <div
-            key={index}
-            className="row"
-            onMouseEnter={() => setHoveredLineIndex(index)}
-            onMouseLeave={() => setHoveredLineIndex(null)}
-          >
-            <span>Line {index + 1}</span>
-            <button className="delete-button" onClick={() => deleteLine(index)}>
-              Delete
+      <div className="main-container">
+        <div className="lines-container">
+          <button className="button" onClick={drawLineButton}>
+            {isDrawingLine ? "[Enter] Complete Line" : "[n] Start New Line"}
+          </button>
+          {lines.map((_line, index) => (
+            <div
+              key={index}
+              className="row"
+              onMouseEnter={() => setHoveredLineIndex(index)}
+              onMouseLeave={() => setHoveredLineIndex(null)}
+            >
+              <span>Line {index + 1}</span>
+              <button
+                className="delete-button"
+                onClick={() => deleteLine(index)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+          <div className="checkbox-container">
+            <label>
+              <input
+                type="checkbox"
+                checked={mirrorAllQuadrants}
+                onChange={() => setMirrorAllQuadrants(!mirrorAllQuadrants)}
+              />
+              Mirror All Quadrants
+            </label>
+          </div>
+        </div>
+        <div className="general-container">
+          <label className="cube-width-label">Wall Thickness (all):</label>
+          <div className="cube-width-container">
+            <button className="arrow-button" onClick={decrementCubeWidth}>
+              [
+            </button>
+            <div className="cube-width-box">{cubeWidth.toFixed(1)}</div>
+            <button className="arrow-button" onClick={incrementCubeWidth}>
+              ]
             </button>
           </div>
-        ))}
+        </div>
+        <div className="export-container">
+          <ExportLevel
+            lines={mirrorAllQuadrants ? getMirroredLinesAllQuadrants() : lines}
+            thickness={cubeWidth}
+          />
+        </div>
       </div>
     </>
   );
@@ -138,7 +240,6 @@ function PointerMovePlane({
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     const point = event.point;
 
-    // Round the X and Y coordinates to the nearest 10
     const x = Math.round(point.x / 10) * 10;
     const y = Math.round(point.y / 10) * 10;
 
@@ -146,11 +247,10 @@ function PointerMovePlane({
   };
 
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
-    if (event.shiftKey) return; // Ignore if shift key is held down
-    event.stopPropagation(); // Prevent the event from bubbling up
+    if (event.shiftKey) return;
+    event.stopPropagation();
     const point = event.point;
 
-    // Round the X and Y coordinates to the nearest 10
     const x = Math.round(point.x / 10) * 10;
     const y = Math.round(point.y / 10) * 10;
 

@@ -15,7 +15,7 @@ export function Camera() {
     y: number;
   } | null>(null);
   const [isShiftDown, setIsShiftDown] = useState(false);
-  const [cursorStyle, setCursorStyle] = useState("crosshair");
+  const [cursorStyle, setCursorStyle] = useState("default");
 
   useEffect(() => {
     const handleMouseDown = (event: MouseEvent) => {
