@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import shipGLTF from "./assets/ship.glb?url";
