@@ -8,6 +8,8 @@ import { LineRenderer } from "./LineRenderer";
 import { ReferenceShip } from "./ReferenceShip";
 import Overlay from "./Overlay";
 import ExportLevel from "./ExportLevel";
+import ImportExportLines from "./ImportExportLines";
+import hamburger from "./assets/hamburger.mp3";
 import * as THREE from "three";
 
 function App() {
@@ -21,6 +23,7 @@ function App() {
   const [hoveredLineIndex, setHoveredLineIndex] = useState<number | null>(null);
   const [cubeWidth, setCubeWidth] = useState(4);
   const [mirrorAllQuadrants, setMirrorAllQuadrants] = useState(false);
+  const [enableAudio, setEnableAudio] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const incrementCubeWidth = useCallback(
@@ -58,13 +61,15 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!isDrawingLine) {
-        if (event.key === "n") {
+        if (event.key === " ") {
+          event.preventDefault();
           drawLineButton();
         }
       } else {
         if (event.key === "Enter") {
           drawLineButton();
-        } else if (event.key === "Escape" || event.key === "n") {
+        } else if (event.key === "Escape" || event.key === " ") {
+          event.preventDefault();
           setIsDrawingLine(false);
           setCurrentLine([]);
         } else if (event.key === "z") {
@@ -76,6 +81,15 @@ function App() {
         decrementCubeWidth();
       } else if (event.key === "]") {
         incrementCubeWidth();
+      }
+
+      if (event.key === "Tab") {
+        event.preventDefault();
+        setIsSidebarOpen((prev) => !prev);
+        if (enableAudio) {
+          const audio = new Audio(hamburger);
+          audio.play();
+        }
       }
     };
 
@@ -100,6 +114,7 @@ function App() {
     incrementCubeWidth,
     isDrawingLine,
     undoLastPoint,
+    enableAudio,
   ]);
 
   const getMirroredLinesAllQuadrants = () => {
@@ -132,9 +147,10 @@ function App() {
       </button>
 
       <div className={`main-container ${isSidebarOpen ? "open" : ""}`}>
+        <div className="hamburger-header"></div>
         <div className="lines-container">
           <button className="button" onClick={drawLineButton}>
-            {isDrawingLine ? "[Enter] Complete Line" : "[n] Start New Line"}
+            {isDrawingLine ? "[Enter] Complete Line" : "[Space] Start New Line"}
           </button>
           {lines.map((_line, index) => (
             <div
@@ -176,12 +192,27 @@ function App() {
           </div>
         </div>
         <div className="export-container">
+          <label className="cube-width-label">Export to Substream</label>
           <ExportLevel
             lines={mirrorAllQuadrants ? getMirroredLinesAllQuadrants() : lines}
             thickness={cubeWidth}
           />
         </div>
+        <div className="import-export-container">
+          <ImportExportLines lines={lines} setLines={setLines} />
+        </div>
+        <div className="checkbox-container">
+          <label>
+            <input
+              type="checkbox"
+              checked={enableAudio}
+              onChange={() => setEnableAudio(!enableAudio)}
+            />
+            Enable Audio
+          </label>
+        </div>
       </div>
+
       <div className="canvas-container">
         <Canvas>
           <Camera />
@@ -230,7 +261,11 @@ function App() {
           )}
           <ReferenceShip />
         </Canvas>
-        <Overlay mouseWorldPos={mouseWorldPos} isDrawingLine={isDrawingLine} />
+        <Overlay
+          mouseWorldPos={mouseWorldPos}
+          isDrawingLine={isDrawingLine}
+          currentLinePoints={currentLine.length}
+        />
       </div>
     </div>
   );

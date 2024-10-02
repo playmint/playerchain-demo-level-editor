@@ -2,6 +2,11 @@
 
 * {
   user-select: none;
+  
+}
+
+:focus {
+  outline: none;
 }
 
 body {
@@ -32,6 +37,10 @@ body {
   z-index: 1000; /* Ensure it appears above other elements */
 }
 
+.hamburger-header{
+  height: 32px;
+  margin-bottom: 10px;
+}
 
 canvas {
   width: 100%;
@@ -81,7 +90,7 @@ canvas {
   left: 0;
   width: 350px; /* Fixed width */
   height: 100%;
-  background-color: #2e2e2e;
+  background-color: #2e2e2e9f;
   overflow-y: auto;
   overflow-x: hidden; /* Prevent horizontal scrolling */
   padding: 20px;
