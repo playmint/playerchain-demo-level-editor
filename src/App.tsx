@@ -9,6 +9,7 @@ import { ReferenceShip } from "./ReferenceShip";
 import Overlay from "./Overlay";
 import ExportLevel from "./ExportLevel";
 import ImportExportLines from "./ImportExportLines";
+import SpawnRadius from "./SpawnRadius";
 import hamburger from "./assets/hamburger.mp3";
 import * as THREE from "three";
 
@@ -260,6 +261,7 @@ function App() {
             />
           )}
           <ReferenceShip />
+          <SpawnRadius />
         </Canvas>
         <Overlay
           mouseWorldPos={mouseWorldPos}
