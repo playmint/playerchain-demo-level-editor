@@ -21,6 +21,7 @@ function App() {
   const [hoveredLineIndex, setHoveredLineIndex] = useState<number | null>(null);
   const [cubeWidth, setCubeWidth] = useState(4);
   const [mirrorAllQuadrants, setMirrorAllQuadrants] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const incrementCubeWidth = useCallback(
     () => setCubeWidth(cubeWidth + 0.5),
@@ -122,56 +123,15 @@ function App() {
   };
 
   return (
-    <>
-      <Canvas>
-        <Camera />
-        <GuideLines />
-        {isDrawingLine && (
-          <PointerMovePlane
-            setMouseWorldPos={setMouseWorldPos}
-            addPointToCurrentLine={(point) =>
-              setCurrentLine((prev) => [...prev, point])
-            }
-          />
-        )}
-        <ReferenceSphere
-          isEnabled={isDrawingLine}
-          position={mouseWorldPos}
-          thickness={cubeWidth}
-        />
-        {lines.map((linePoints, index) => (
-          <LineRenderer
-            key={index}
-            points={linePoints}
-            color={hoveredLineIndex === index ? "yellow" : "white"}
-          />
-        ))}
-        {mirrorAllQuadrants &&
-          getMirroredLinesAllQuadrants().map((linePoints, index) => (
-            <LineRenderer
-              key={`mirror-${index}`}
-              points={linePoints}
-              color={
-                index % 4 === 0
-                  ? "white"
-                  : index % 4 === 1
-                  ? "red"
-                  : index % 4 === 2
-                  ? "green"
-                  : "blue"
-              }
-            />
-          ))}
-        {isDrawingLine && currentLine.length > 0 && (
-          <LineRenderer
-            points={[...currentLine, new THREE.Vector3(...mouseWorldPos)]}
-            color="grey"
-          />
-        )}
-        <ReferenceShip />
-      </Canvas>
-      <Overlay mouseWorldPos={mouseWorldPos} isDrawingLine={isDrawingLine} />
-      <div className="main-container">
+    <div className="app-layout">
+      <button
+        className="hamburger-button"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰
+      </button>
+
+      <div className={`main-container ${isSidebarOpen ? "open" : ""}`}>
         <div className="lines-container">
           <button className="button" onClick={drawLineButton}>
             {isDrawingLine ? "[Enter] Complete Line" : "[n] Start New Line"}
@@ -222,7 +182,57 @@ function App() {
           />
         </div>
       </div>
-    </>
+      <div className="canvas-container">
+        <Canvas>
+          <Camera />
+          <GuideLines />
+          {isDrawingLine && (
+            <PointerMovePlane
+              setMouseWorldPos={setMouseWorldPos}
+              addPointToCurrentLine={(point) =>
+                setCurrentLine((prev) => [...prev, point])
+              }
+            />
+          )}
+          <ReferenceSphere
+            isEnabled={isDrawingLine}
+            position={mouseWorldPos}
+            thickness={cubeWidth}
+          />
+          {lines.map((linePoints, index) => (
+            <LineRenderer
+              key={index}
+              points={linePoints}
+              color={hoveredLineIndex === index ? "yellow" : "white"}
+            />
+          ))}
+          {mirrorAllQuadrants &&
+            getMirroredLinesAllQuadrants().map((linePoints, index) => (
+              <LineRenderer
+                key={`mirror-${index}`}
+                points={linePoints}
+                color={
+                  index % 4 === 0
+                    ? "white"
+                    : index % 4 === 1
+                    ? "red"
+                    : index % 4 === 2
+                    ? "green"
+                    : "blue"
+                }
+              />
+            ))}
+          {isDrawingLine && currentLine.length > 0 && (
+            <LineRenderer
+              points={[...currentLine, new THREE.Vector3(...mouseWorldPos)]}
+              color="grey"
+            />
+          )}
+          <ReferenceShip />
+        </Canvas>
+        <Overlay mouseWorldPos={mouseWorldPos} isDrawingLine={isDrawingLine} />
+      </div>
+    </div>
   );
 }
 
