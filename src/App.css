@@ -1,8 +1,5 @@
-/* App.css */
-
 * {
   user-select: none;
-  
 }
 
 :focus {
@@ -34,10 +31,10 @@ body {
   font-size: 30px;
   color: #f8f9fa;
   cursor: pointer;
-  z-index: 1000; /* Ensure it appears above other elements */
+  z-index: 1000;
 }
 
-.hamburger-header{
+.hamburger-header {
   height: 32px;
   margin-bottom: 10px;
 }
@@ -45,7 +42,7 @@ body {
 canvas {
   width: 100%;
   height: 100%;
-  display: block; /* Remove inline-block spacing */
+  display: block;
 }
 
 .app-layout {
@@ -88,28 +85,26 @@ canvas {
   position: absolute;
   top: 0;
   left: 0;
-  width: 350px; /* Fixed width */
+  width: 350px;
   height: 100%;
   background-color: #2e2e2e9f;
   overflow-y: auto;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-x: hidden;
   padding: 20px;
-  box-sizing: border-box; /* Ensure padding is included in width */
-  transform: translateX(-100%); /* Hide sidebar by default */
+  box-sizing: border-box;
+  transform: translateX(-100%);
   transition: transform 0.3s ease-in-out;
   z-index: 999;
 }
 
-/* Show sidebar when 'open' class is added */
 .main-container.open {
   transform: translateX(0);
 }
 
-/* Add spacing between sections */
 .lines-container,
 .general-container,
 .export-container {
-  margin-bottom: 20px; /* Space between sections */
+  margin-bottom: 20px;
   background-color: #3e3e3e;
   padding: 15px;
   border-radius: 8px;
@@ -175,8 +170,8 @@ canvas {
   padding: 20px;
   background-color: #2e2e2e;
   border-radius: 8px;
-  width: 320px; /* Increased width to accommodate padding */
-  box-sizing: border-box; /* Ensure padding is included in the width */
+  width: 320px;
+  box-sizing: border-box;
   margin: 10px;
 }
 
@@ -208,7 +203,7 @@ canvas {
   justify-content: space-between;
   transition: background-color 0.3s ease, border 0.3s ease;
   border: 2px solid transparent;
-  box-sizing: border-box; /* Ensure padding is included in the width */
+  box-sizing: border-box;
 }
 
 .row:hover {
@@ -263,7 +258,6 @@ canvas {
   align-items: flex-start;
 }
 
-/* New styles for cube width component */
 .cube-width-container {
   display: flex;
   align-items: center;
@@ -303,5 +297,5 @@ canvas {
   background-color: #3e3e3e;
   color: #f8f9fa;
   border-radius: 8px;
-  box-sizing: border-box; /* Ensure padding is included in the width */
+  box-sizing: border-box;
 }
