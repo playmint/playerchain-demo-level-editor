@@ -63,6 +63,10 @@ export function Camera() {
       } else if (event.key === "0") {
         camera.position.x = 0;
         camera.position.y = 0;
+      } else if (event.key === "=" || event.key === "+") {
+        setCurrentZoom((prevZoom) => Math.min(prevZoom + 0.25, 10));
+      } else if (event.key === "-" || event.key === "_") {
+        setCurrentZoom((prevZoom) => Math.max(prevZoom - 0.25, 1));
       }
     };
 
