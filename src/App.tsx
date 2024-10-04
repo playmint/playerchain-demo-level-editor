@@ -255,6 +255,7 @@ function App() {
               addPointToCurrentLine={(point) =>
                 setCurrentLine((prev) => [...prev, point])
               }
+              currentLine={currentLine}
             />
           )}
           <ReferenceSphere
@@ -311,15 +312,32 @@ type SetMouseWorldPosType = React.Dispatch<
 function PointerMovePlane({
   setMouseWorldPos,
   addPointToCurrentLine,
+  currentLine,
 }: {
   setMouseWorldPos: SetMouseWorldPosType;
   addPointToCurrentLine: (point: THREE.Vector3) => void;
+  currentLine: THREE.Vector3[];
 }) {
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     const point = event.point;
 
-    const x = Math.round(point.x / 10) * 10;
-    const y = Math.round(point.y / 10) * 10;
+    let x = Math.round(point.x / 10) * 10;
+    let y = Math.round(point.y / 10) * 10;
+
+    if (currentLine.length > 0) {
+      const lastPoint = currentLine[currentLine.length - 1];
+      const dx = x - lastPoint.x;
+      const dy = y - lastPoint.y;
+      const angle = Math.atan2(dy, dx);
+      const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      x = lastPoint.x + distance * Math.cos(snappedAngle);
+      y = lastPoint.y + distance * Math.sin(snappedAngle);
+
+      // Snap to grid
+      x = Math.round(x / 10) * 10;
+      y = Math.round(y / 10) * 10;
+    }
 
     setMouseWorldPos([x, y, 0]);
   };
@@ -333,6 +351,22 @@ function PointerMovePlane({
     const y = Math.round(point.y / 10) * 10;
 
     const newPoint = new THREE.Vector3(x, y, 0);
+
+    if (currentLine.length > 0) {
+      const lastPoint = currentLine[currentLine.length - 1];
+      const dx = newPoint.x - lastPoint.x;
+      const dy = newPoint.y - lastPoint.y;
+      const angle = Math.atan2(dy, dx);
+      const snappedAngle = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      newPoint.x = lastPoint.x + distance * Math.cos(snappedAngle);
+      newPoint.y = lastPoint.y + distance * Math.sin(snappedAngle);
+
+      // Snap to grid
+      newPoint.x = Math.round(newPoint.x / 10) * 10;
+      newPoint.y = Math.round(newPoint.y / 10) * 10;
+    }
+
     addPointToCurrentLine(newPoint);
   };
 
