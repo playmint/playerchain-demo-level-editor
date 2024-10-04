@@ -100,6 +100,10 @@ function App() {
           audio.play();
         }
       }
+
+      if (event.key === "m") {
+        setMirrorAllQuadrants((prev) => !prev);
+      }
     };
 
     const handleContextMenu = (event: MouseEvent) => {
@@ -184,7 +188,7 @@ function App() {
                 checked={mirrorAllQuadrants}
                 onChange={() => setMirrorAllQuadrants(!mirrorAllQuadrants)}
               />
-              Mirror All Quadrants
+              [m]irror
             </label>
           </div>
         </div>
