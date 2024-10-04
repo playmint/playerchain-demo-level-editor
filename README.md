@@ -1,50 +1,59 @@
-# React + TypeScript + Vite
+# Playerchain Demo Map Editor
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Try it out here: https://playmint.github.io/substream-map-editor/
 
-Currently, two official plugins are available:
+## Controls
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### General Controls
 
-## Expanding the ESLint configuration
+- **[Space]**: Start a new line. Press again to complete the current line.
+- **[Enter]**: Complete the current line.
+- **[Escape] / [Space]**: Cancel drawing the current line.
+- **[z]**: Undo the last point added while drawing a line.
+- **[Tab]**: Toggle the sidebar on/off.
+- **[m]**: Mirror lines across all quadrants.
+- **[0]**: Reset camera position to the center.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### Line Drawing and Deletion
 
-- Configure the top-level `parserOptions` property like this:
+- **Mouse Click**: Add a point to the current line.
+- **Shift + Mouse Click**: Pan the camera view.
+- **Right-Click**: Cancel drawing the current line.
+- **Delete Button (on the sidebar)**: Delete an existing line.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+### Camera Controls
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+- **[Shift + Mouse Drag]**: Pan the camera.
+- **[+ / =]**: Zoom in the camera view.
+- **[- / _]**: Zoom out the camera view.
+- **Scroll Wheel** (while holding **Shift**): Zoom in/out smoothly.
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+### Other Controls
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- **[ [ ]**: Decrease wall thickness.
+- **[ ] ]**: Increase wall thickness.
+- **[Slider/Input Box]**: Adjust the spawn radius value.
+
+## Features
+
+- **Mirror Mode**: Use the `m` key or the checkbox in the sidebar to mirror your lines across all four quadrants.
+- **Wall Thickness Adjustment**: Modify the thickness of the walls using `[ ]` keys or the sidebar controls.
+- **Spawn Radius**: Adjust the spawn radius using the slider or input box in the sidebar.
+- **Import/Export**: Easily import and export your line configurations.
+
+## Exporting Maps
+
+- Use the "Export to Substream" button in the sidebar to save your map configuration for use in Substream.
+
+## Audio
+
+- **Enable Audio Checkbox**: Toggle audio feedback when using the editor.
+
+## Notes
+
+- The cursor changes based on context:
+  - **Crosshair**: Default state.
+  - **Grab**: Hovering with **Shift** pressed.
+  - **Grabbing**: Panning while dragging with **Shift** pressed.
+
+---
