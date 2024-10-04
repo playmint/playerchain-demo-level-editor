@@ -26,6 +26,7 @@ function App() {
   const [mirrorAllQuadrants, setMirrorAllQuadrants] = useState(false);
   const [enableAudio, setEnableAudio] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [radius, setRadius] = useState(300);
 
   const incrementCubeWidth = useCallback(
     () => setCubeWidth(cubeWidth + 0.5),
@@ -35,6 +36,13 @@ function App() {
     () => setCubeWidth(Math.max(0.5, cubeWidth - 0.5)),
     [cubeWidth]
   );
+
+  const handleRadiusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newRadius = parseFloat(event.target.value);
+    if (!isNaN(newRadius)) {
+      setRadius(newRadius);
+    }
+  };
 
   const drawLineButton = useCallback(() => {
     if (isDrawingLine) {
@@ -192,6 +200,25 @@ function App() {
             </button>
           </div>
         </div>
+        <div className="general-container">
+          <label className="cube-width-label">Spawn Radius:</label>
+          <input
+            type="number"
+            value={radius}
+            step="10"
+            onChange={handleRadiusChange}
+            className="radius-input"
+          />
+          <input
+            type="range"
+            min="0"
+            max="500"
+            step="10"
+            value={radius}
+            onChange={handleRadiusChange}
+            className="radius-slider"
+          />
+        </div>
         <div className="export-container">
           <label className="cube-width-label">Export to Substream</label>
           <ExportLevel
@@ -261,7 +288,7 @@ function App() {
             />
           )}
           <ReferenceShip />
-          <SpawnRadius />
+          <SpawnRadius radius={radius} />
         </Canvas>
         <Overlay
           mouseWorldPos={mouseWorldPos}

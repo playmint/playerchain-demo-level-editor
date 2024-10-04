@@ -39,6 +39,11 @@ body {
   margin-bottom: 10px;
 }
 
+.radius-slider {
+  width: 100%;
+  margin-top: 8px;
+}
+
 canvas {
   width: 100%;
   height: 100%;
@@ -261,13 +266,13 @@ canvas {
 .cube-width-container {
   display: flex;
   align-items: center;
-  margin-top: 10px;
 }
 
 .cube-width-label {
   font-size: 14px;
   color: #f8f9fa;
   margin-right: 10px;
+  margin-bottom: 10px;
 }
 
 .arrow-button {

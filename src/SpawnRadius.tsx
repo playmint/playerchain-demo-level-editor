@@ -2,14 +2,17 @@
 import { useRef, useEffect, useMemo } from "react";
 import * as THREE from "three";
 
-function SpawnRadius() {
+interface SpawnRadiusProps {
+  radius: number;
+}
+
+function SpawnRadius({ radius }: SpawnRadiusProps) {
   const lineRef = useRef<THREE.LineLoop>(null);
 
   // Memoize the geometry to prevent unnecessary recalculations
   const geometry = useMemo(() => {
     const points = [];
     const segments = 48;
-    const radius = 300;
     for (let i = 0; i <= segments; i++) {
       const theta = (i / segments) * Math.PI * 2;
       points.push(
@@ -18,7 +21,7 @@ function SpawnRadius() {
     }
     const geom = new THREE.BufferGeometry().setFromPoints(points);
     return geom;
-  }, []);
+  }, [radius]);
 
   // Compute line distances required for dashed lines
   useEffect(() => {
