@@ -224,7 +224,7 @@ function App() {
           />
         </div>
         <div className="export-container">
-          <label className="cube-width-label">Export to Substream</label>
+          <label className="cube-width-label">Export to Playerchain Demo</label>
           <ExportLevel
             lines={mirrorAllQuadrants ? getMirroredLinesAllQuadrants() : lines}
             thickness={cubeWidth}

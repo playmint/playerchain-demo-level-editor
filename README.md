@@ -43,7 +43,7 @@ Try it out here: https://playmint.github.io/substream-map-editor/
 
 ## Exporting Maps
 
-- Use the "Export to Substream" button in the sidebar to save your map configuration for use in Substream.
+- Use the "Export to Playerchain Demo" button in the sidebar to save your map configuration for use in the Playerchain Demo.
 
 ## Audio
 
