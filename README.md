@@ -47,13 +47,6 @@ Try it out here: https://playmint.github.io/substream-map-editor/
 
 ## Audio
 
-- **Enable Audio Checkbox**: Toggle audio feedback when using the editor.
-
-## Notes
-
-- The cursor changes based on context:
-  - **Crosshair**: Default state.
-  - **Grab**: Hovering with **Shift** pressed.
-  - **Grabbing**: Panning while dragging with **Shift** pressed.
+- **Enable Audio Checkbox**: 🍔
 
 ---
