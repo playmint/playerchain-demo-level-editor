@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import shipGLTF from "./assets/ship.glb?url";
+//import shipGLTF from "./assets/walls/wall_medium.glb?url";
 import * as THREE from "three";
 
 export const ReferenceShip = () => {
   const gltf = useGLTF(shipGLTF);
+  //gltf.scene.scale.set(10, 10, 10);
   const { camera } = useThree();
   const [shipPosition, setShipPosition] = useState(new THREE.Vector3(0, 0, 0));
   const [shipRotation, setShipRotation] = useState(new THREE.Quaternion());

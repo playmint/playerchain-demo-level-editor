@@ -236,6 +236,22 @@ canvas {
   background-color: #c82333;
 }
 
+.row .flip-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.row .flip-button:hover {
+  background-color: #0056b3;
+}
+
 .overlay {
   position: absolute;
   top: 10px;

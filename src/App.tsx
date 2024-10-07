@@ -11,6 +11,7 @@ import ExportLevel from "./ExportLevel";
 import ImportExportLines from "./ImportExportLines";
 import SpawnRadius from "./SpawnRadius";
 import hamburger from "./assets/hamburger.mp3";
+import CalcWallModels from "./CalcWallModels";
 import * as THREE from "three";
 
 function App() {
@@ -59,6 +60,12 @@ function App() {
 
   const deleteLine = (index: number) => {
     setLines((prevLines) => prevLines.filter((_, i) => i !== index));
+  };
+
+  const flipLine = (index: number) => {
+    setLines((prevLines) =>
+      prevLines.map((line, i) => (i === index ? line.slice().reverse() : line))
+    );
   };
 
   const undoLastPoint = useCallback(() => {
@@ -134,12 +141,12 @@ function App() {
     const mirroredLines: THREE.Vector3[][] = [];
 
     lines.forEach((line) => {
-      const mirroredLineX = line.map(
-        (point) => new THREE.Vector3(-point.x, point.y, point.z)
-      );
-      const mirroredLineY = line.map(
-        (point) => new THREE.Vector3(point.x, -point.y, point.z)
-      );
+      const mirroredLineX = line
+        .map((point) => new THREE.Vector3(-point.x, point.y, point.z))
+        .reverse();
+      const mirroredLineY = line
+        .map((point) => new THREE.Vector3(point.x, -point.y, point.z))
+        .reverse();
       const mirroredLineXY = line.map(
         (point) => new THREE.Vector3(-point.x, -point.y, point.z)
       );
@@ -173,6 +180,9 @@ function App() {
               onMouseLeave={() => setHoveredLineIndex(null)}
             >
               <span>Line {index + 1}</span>
+              <button className="flip-button" onClick={() => flipLine(index)}>
+                Flip
+              </button>
               <button
                 className="delete-button"
                 onClick={() => deleteLine(index)}
@@ -268,6 +278,7 @@ function App() {
               key={index}
               points={linePoints}
               color={hoveredLineIndex === index ? "yellow" : "white"}
+              width={hoveredLineIndex === index ? 20 : 5}
             />
           ))}
           {mirrorAllQuadrants &&
@@ -284,16 +295,21 @@ function App() {
                     ? "green"
                     : "blue"
                 }
+                width={hoveredLineIndex === index && index % 4 === 0 ? 10 : 5}
               />
             ))}
           {isDrawingLine && currentLine.length > 0 && (
             <LineRenderer
               points={[...currentLine, new THREE.Vector3(...mouseWorldPos)]}
               color="grey"
+              width={5}
             />
           )}
           <ReferenceShip />
           <SpawnRadius radius={radius} />
+          <CalcWallModels
+            lines={mirrorAllQuadrants ? getMirroredLinesAllQuadrants() : lines}
+          />
         </Canvas>
         <Overlay
           mouseWorldPos={mouseWorldPos}
