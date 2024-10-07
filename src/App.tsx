@@ -27,7 +27,7 @@ function App() {
   const [mirrorAllQuadrants, setMirrorAllQuadrants] = useState(false);
   const [enableAudio, setEnableAudio] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [radius, setRadius] = useState(300);
+  const [radius, setRadius] = useState(200);
 
   const incrementCubeWidth = useCallback(
     () => setCubeWidth(cubeWidth + 0.5),
