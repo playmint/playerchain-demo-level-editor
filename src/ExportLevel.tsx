@@ -4,7 +4,6 @@ import * as THREE from "three";
 interface Wall {
   position: { x: number; y: number };
   width: number;
-  height: number;
   rotation: number;
 }
 
@@ -42,13 +41,10 @@ const ExportLevel: React.FC<ExportLevelProps> = ({
         // Calculate width (distance between points)
         const width = start.distanceTo(end);
 
-        // Fixed height
-        const height = thickness;
-
         // Calculate rotation (angle between points)
         const rotation = Math.atan2(end.y - start.y, end.x - start.x);
 
-        walls.push({ position, width, height, rotation });
+        walls.push({ position, width, rotation });
       }
     });
 
@@ -69,7 +65,6 @@ const ExportLevel: React.FC<ExportLevelProps> = ({
         (wall) => `{
       position: { x: ${wall.position.x}, y: ${wall.position.y} },
       width: ${wall.width},
-      height: ${wall.height},
       rotation: ${wall.rotation}
     }`
       )
@@ -83,8 +78,7 @@ const ExportLevel: React.FC<ExportLevelProps> = ({
       .map(
         (point) => `{
       x: ${point.x},
-      y: ${point.y},
-      z: ${point.z}
+      y: ${point.y}
     }`
       )
       .join(",\n    ")}
