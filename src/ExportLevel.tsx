@@ -10,14 +10,18 @@ interface Wall {
 
 interface ExportLevelProps {
   lines: THREE.Vector3[][];
+  spawnPoints: THREE.Vector3[];
   thickness: number;
   models: { name: string; position: THREE.Vector3; rotation: number }[];
+  spawnRadius: number;
 }
 
 const ExportLevel: React.FC<ExportLevelProps> = ({
   lines,
+  spawnPoints,
   thickness,
   models,
+  spawnRadius,
 }) => {
   const [output, setOutput] = useState("");
 
@@ -73,7 +77,20 @@ const ExportLevel: React.FC<ExportLevelProps> = ({
   ],
   models: [
     ${formattedModels}
-  ]
+  ],
+  spawnPoints: [
+    ${spawnPoints
+      .map(
+        (point) => `{
+      x: ${point.x},
+      y: ${point.y},
+      z: ${point.z}
+    }`
+      )
+      .join(",\n    ")}
+  ],
+  spawnRadius: ${spawnRadius},
+  wallColliderWidth: ${thickness}
 };`;
 
     setOutput(formattedOutput);

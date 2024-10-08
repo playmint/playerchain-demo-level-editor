@@ -27,7 +27,7 @@ function App() {
   const [hoveredSpawnPointIndex, setHoveredSpawnPointIndex] = useState<
     number | null
   >(null);
-  const [cubeWidth, setCubeWidth] = useState(4);
+  const [wallColliderWidth, setWallColliderWidth] = useState(2.5);
   const [mirrorAllQuadrants, setMirrorAllQuadrants] = useState(false);
   const [enableAudio, setEnableAudio] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -36,13 +36,13 @@ function App() {
     { name: string; position: THREE.Vector3; rotation: number }[]
   >([]);
 
-  const incrementCubeWidth = useCallback(
-    () => setCubeWidth(cubeWidth + 0.5),
-    [cubeWidth]
+  const incrementWallColliderWidth = useCallback(
+    () => setWallColliderWidth(wallColliderWidth + 0.5),
+    [wallColliderWidth]
   );
-  const decrementCubeWidth = useCallback(
-    () => setCubeWidth(Math.max(0.5, cubeWidth - 0.5)),
-    [cubeWidth]
+  const decrementWallColliderWidth = useCallback(
+    () => setWallColliderWidth(Math.max(0.5, wallColliderWidth - 0.5)),
+    [wallColliderWidth]
   );
 
   const handleRadiusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,9 +125,9 @@ function App() {
       }
 
       if (event.key === "[") {
-        decrementCubeWidth();
+        decrementWallColliderWidth();
       } else if (event.key === "]") {
-        incrementCubeWidth();
+        incrementWallColliderWidth();
       }
 
       if (event.key === "Tab") {
@@ -163,9 +163,9 @@ function App() {
       window.removeEventListener("contextmenu", handleContextMenu);
     };
   }, [
-    decrementCubeWidth,
+    decrementWallColliderWidth,
     drawLineButton,
-    incrementCubeWidth,
+    incrementWallColliderWidth,
     isDrawingLine,
     undoLastPoint,
     enableAudio,
@@ -191,6 +191,20 @@ function App() {
     });
 
     return mirroredLines;
+  };
+
+  const getMirroredSpawnPointsAllQuadrants = () => {
+    const mirroredSpawnPoints: THREE.Vector3[] = [];
+
+    spawnPoints.forEach((point) => {
+      const mirroredX = new THREE.Vector3(-point.x, point.y, point.z);
+      const mirroredY = new THREE.Vector3(point.x, -point.y, point.z);
+      const mirroredXY = new THREE.Vector3(-point.x, -point.y, point.z);
+
+      mirroredSpawnPoints.push(point, mirroredX, mirroredY, mirroredXY);
+    });
+
+    return mirroredSpawnPoints;
   };
 
   const addSpawnPoint = (point: THREE.Vector3) => {
@@ -266,13 +280,19 @@ function App() {
         </div>
 
         <div className="general-container">
-          <label className="cube-width-label">Wall Thickness (all):</label>
+          <label className="cube-width-label">Wall Collider Width (all):</label>
           <div className="cube-width-container">
-            <button className="arrow-button" onClick={decrementCubeWidth}>
+            <button
+              className="arrow-button"
+              onClick={decrementWallColliderWidth}
+            >
               [
             </button>
-            <div className="cube-width-box">{cubeWidth.toFixed(1)}</div>
-            <button className="arrow-button" onClick={incrementCubeWidth}>
+            <div className="cube-width-box">{wallColliderWidth.toFixed(1)}</div>
+            <button
+              className="arrow-button"
+              onClick={incrementWallColliderWidth}
+            >
               ]
             </button>
           </div>
@@ -300,8 +320,14 @@ function App() {
           <label className="cube-width-label">Export to Playerchain Demo</label>
           <ExportLevel
             lines={mirrorAllQuadrants ? getMirroredLinesAllQuadrants() : lines}
-            thickness={cubeWidth}
+            thickness={wallColliderWidth}
             models={models}
+            spawnPoints={
+              mirrorAllQuadrants
+                ? getMirroredSpawnPointsAllQuadrants()
+                : spawnPoints
+            }
+            spawnRadius={radius}
           />
         </div>
         <div className="import-export-container">
@@ -348,7 +374,7 @@ function App() {
           <ReferenceSphere
             isEnabled={isDrawingLine}
             position={mouseWorldPos}
-            thickness={cubeWidth}
+            thickness={wallColliderWidth}
             useSphere={false}
             color={"grey"}
           />
@@ -367,16 +393,28 @@ function App() {
               width={hoveredLineIndex === index ? 20 : 5}
             />
           ))}
-          {spawnPoints.map((pos, index) => (
-            <ReferenceSphere
-              key={index}
-              isEnabled={true}
-              position={[pos.x, pos.y, pos.z]}
-              thickness={4}
-              useSphere={true}
-              color={hoveredSpawnPointIndex === index ? "yellow" : "purple"}
-            />
-          ))}
+          {mirrorAllQuadrants
+            ? getMirroredSpawnPointsAllQuadrants().map((pos, index) => (
+                <ReferenceSphere
+                  key={`spawn-mirror-${index}`}
+                  isEnabled={true}
+                  position={[pos.x, pos.y, pos.z]}
+                  thickness={4}
+                  useSphere={true}
+                  color={hoveredSpawnPointIndex === index ? "yellow" : "purple"}
+                />
+              ))
+            : spawnPoints.map((pos, index) => (
+                <ReferenceSphere
+                  key={index}
+                  isEnabled={true}
+                  position={[pos.x, pos.y, pos.z]}
+                  thickness={4}
+                  useSphere={true}
+                  color={hoveredSpawnPointIndex === index ? "yellow" : "purple"}
+                />
+              ))}
+
           {mirrorAllQuadrants &&
             getMirroredLinesAllQuadrants().map((linePoints, index) => (
               <LineRenderer
