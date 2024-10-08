@@ -16,13 +16,17 @@ import * as THREE from "three";
 
 function App() {
   const [isDrawingLine, setIsDrawingLine] = useState(false);
+  const [isDrawingSpawnPoint, setisDrawingSpawnPoint] = useState(false);
   const [mouseWorldPos, setMouseWorldPos] = useState<[number, number, number]>([
     0, 0, 0,
   ]);
-
   const [lines, setLines] = useState<THREE.Vector3[][]>([]);
+  const [spawnPoints, setSpawnPoints] = useState<THREE.Vector3[]>([]);
   const [currentLine, setCurrentLine] = useState<THREE.Vector3[]>([]);
   const [hoveredLineIndex, setHoveredLineIndex] = useState<number | null>(null);
+  const [hoveredSpawnPointIndex, setHoveredSpawnPointIndex] = useState<
+    number | null
+  >(null);
   const [cubeWidth, setCubeWidth] = useState(4);
   const [mirrorAllQuadrants, setMirrorAllQuadrants] = useState(false);
   const [enableAudio, setEnableAudio] = useState(false);
@@ -58,11 +62,27 @@ function App() {
     } else {
       setIsDrawingLine(true);
       setCurrentLine([]);
+      setisDrawingSpawnPoint(false);
     }
   }, [isDrawingLine, currentLine]);
 
+  const drawSpawnPointButton = useCallback(() => {
+    if (isDrawingSpawnPoint) {
+      setisDrawingSpawnPoint(false);
+    } else {
+      setisDrawingSpawnPoint(true);
+      setIsDrawingLine(false);
+    }
+  }, [isDrawingSpawnPoint]);
+
   const deleteLine = (index: number) => {
     setLines((prevLines) => prevLines.filter((_, i) => i !== index));
+  };
+
+  const deleteSpawnPoint = (index: number) => {
+    setSpawnPoints((prevSpawnPoints) =>
+      prevSpawnPoints.filter((_, i) => i !== index)
+    );
   };
 
   const flipLine = (index: number) => {
@@ -79,12 +99,15 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!isDrawingLine) {
+      if (!isDrawingLine && !isDrawingSpawnPoint) {
         if (event.key === " ") {
           event.preventDefault();
           drawLineButton();
+        } else if (event.key === "s") {
+          event.preventDefault();
+          drawSpawnPointButton();
         }
-      } else {
+      } else if (isDrawingLine) {
         if (event.key === "Enter") {
           drawLineButton();
         } else if (event.key === "Escape" || event.key === " ") {
@@ -93,6 +116,11 @@ function App() {
           setCurrentLine([]);
         } else if (event.key === "z") {
           undoLastPoint();
+        }
+      } else if (isDrawingSpawnPoint) {
+        if (event.key === "Escape" || event.key === "s") {
+          event.preventDefault();
+          setisDrawingSpawnPoint(false);
         }
       }
 
@@ -122,6 +150,9 @@ function App() {
         setIsDrawingLine(false);
         setCurrentLine([]);
       }
+      if (isDrawingSpawnPoint) {
+        setisDrawingSpawnPoint(false);
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -138,6 +169,8 @@ function App() {
     isDrawingLine,
     undoLastPoint,
     enableAudio,
+    isDrawingSpawnPoint,
+    drawSpawnPointButton,
   ]);
 
   const getMirroredLinesAllQuadrants = () => {
@@ -158,6 +191,10 @@ function App() {
     });
 
     return mirroredLines;
+  };
+
+  const addSpawnPoint = (point: THREE.Vector3) => {
+    setSpawnPoints((prevSpawnPoints) => [...prevSpawnPoints, point]);
   };
 
   return (
@@ -205,6 +242,29 @@ function App() {
             </label>
           </div>
         </div>
+
+        <div className="lines-container">
+          <button className="button" onClick={drawSpawnPointButton}>
+            {isDrawingSpawnPoint ? "[Escape] Cancel" : "[s] Place Spawn Points"}
+          </button>
+          {spawnPoints.map((_line, index) => (
+            <div
+              key={index}
+              className="row"
+              onMouseEnter={() => setHoveredSpawnPointIndex(index)}
+              onMouseLeave={() => setHoveredSpawnPointIndex(null)}
+            >
+              <span>Spawn Point {index + 1}</span>
+              <button
+                className="delete-button"
+                onClick={() => deleteSpawnPoint(index)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+
         <div className="general-container">
           <label className="cube-width-label">Wall Thickness (all):</label>
           <div className="cube-width-container">
@@ -269,13 +329,35 @@ function App() {
               addPointToCurrentLine={(point) =>
                 setCurrentLine((prev) => [...prev, point])
               }
+              addSpawnPoint={addSpawnPoint}
               currentLine={currentLine}
+              isDrawingSpawnPoint={isDrawingSpawnPoint}
+            />
+          )}
+          {isDrawingSpawnPoint && (
+            <PointerMovePlane
+              setMouseWorldPos={setMouseWorldPos}
+              addPointToCurrentLine={(point) =>
+                setCurrentLine((prev) => [...prev, point])
+              }
+              addSpawnPoint={addSpawnPoint}
+              currentLine={currentLine}
+              isDrawingSpawnPoint={isDrawingSpawnPoint}
             />
           )}
           <ReferenceSphere
             isEnabled={isDrawingLine}
             position={mouseWorldPos}
             thickness={cubeWidth}
+            useSphere={false}
+            color={"grey"}
+          />
+          <ReferenceSphere
+            isEnabled={isDrawingSpawnPoint}
+            position={mouseWorldPos}
+            thickness={4}
+            useSphere={true}
+            color={"grey"}
           />
           {lines.map((linePoints, index) => (
             <LineRenderer
@@ -283,6 +365,16 @@ function App() {
               points={linePoints}
               color={hoveredLineIndex === index ? "yellow" : "white"}
               width={hoveredLineIndex === index ? 20 : 5}
+            />
+          ))}
+          {spawnPoints.map((pos, index) => (
+            <ReferenceSphere
+              key={index}
+              isEnabled={true}
+              position={[pos.x, pos.y, pos.z]}
+              thickness={4}
+              useSphere={true}
+              color={hoveredSpawnPointIndex === index ? "yellow" : "purple"}
             />
           ))}
           {mirrorAllQuadrants &&
@@ -333,11 +425,15 @@ type SetMouseWorldPosType = React.Dispatch<
 function PointerMovePlane({
   setMouseWorldPos,
   addPointToCurrentLine,
+  addSpawnPoint,
   currentLine,
+  isDrawingSpawnPoint,
 }: {
   setMouseWorldPos: SetMouseWorldPosType;
   addPointToCurrentLine: (point: THREE.Vector3) => void;
+  addSpawnPoint: (point: THREE.Vector3) => void;
   currentLine: THREE.Vector3[];
+  isDrawingSpawnPoint: boolean;
 }) {
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     const point = event.point;
@@ -345,7 +441,7 @@ function PointerMovePlane({
     let x = Math.round(point.x / 10) * 10;
     let y = Math.round(point.y / 10) * 10;
 
-    if (currentLine.length > 0) {
+    if (currentLine.length > 0 && !isDrawingSpawnPoint) {
       const lastPoint = currentLine[currentLine.length - 1];
       const dx = x - lastPoint.x;
       const dy = y - lastPoint.y;
@@ -364,7 +460,7 @@ function PointerMovePlane({
   };
 
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
-    if (event.shiftKey) return;
+    if (event.button === 2 || event.shiftKey) return;
     event.stopPropagation();
     const point = event.point;
 
@@ -373,7 +469,9 @@ function PointerMovePlane({
 
     const newPoint = new THREE.Vector3(x, y, 0);
 
-    if (currentLine.length > 0) {
+    if (isDrawingSpawnPoint) {
+      addSpawnPoint(newPoint);
+    } else if (currentLine.length > 0) {
       const lastPoint = currentLine[currentLine.length - 1];
       const dx = newPoint.x - lastPoint.x;
       const dy = newPoint.y - lastPoint.y;
@@ -388,7 +486,9 @@ function PointerMovePlane({
       newPoint.y = Math.round(newPoint.y / 10) * 10;
     }
 
-    addPointToCurrentLine(newPoint);
+    if (!isDrawingSpawnPoint) {
+      addPointToCurrentLine(newPoint);
+    }
   };
 
   return (
