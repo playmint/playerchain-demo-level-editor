@@ -28,6 +28,9 @@ function App() {
   const [enableAudio, setEnableAudio] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [radius, setRadius] = useState(200);
+  const [models, setModels] = useState<
+    { name: string; position: THREE.Vector3; rotation: number }[]
+  >([]);
 
   const incrementCubeWidth = useCallback(
     () => setCubeWidth(cubeWidth + 0.5),
@@ -238,6 +241,7 @@ function App() {
           <ExportLevel
             lines={mirrorAllQuadrants ? getMirroredLinesAllQuadrants() : lines}
             thickness={cubeWidth}
+            models={models}
           />
         </div>
         <div className="import-export-container">
@@ -309,6 +313,7 @@ function App() {
           <SpawnRadius radius={radius} />
           <CalcWallModels
             lines={mirrorAllQuadrants ? getMirroredLinesAllQuadrants() : lines}
+            setModels={setModels}
           />
         </Canvas>
         <Overlay

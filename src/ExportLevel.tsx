@@ -11,9 +11,14 @@ interface Wall {
 interface ExportLevelProps {
   lines: THREE.Vector3[][];
   thickness: number;
+  models: { name: string; position: THREE.Vector3; rotation: number }[];
 }
 
-const ExportLevel: React.FC<ExportLevelProps> = ({ lines, thickness }) => {
+const ExportLevel: React.FC<ExportLevelProps> = ({
+  lines,
+  thickness,
+  models,
+}) => {
   const [output, setOutput] = useState("");
 
   const calculateWalls = () => {
@@ -43,6 +48,16 @@ const ExportLevel: React.FC<ExportLevelProps> = ({ lines, thickness }) => {
       }
     });
 
+    const formattedModels = models
+      .map(
+        (model) => `{
+      name: "${model.name}",
+      position: { x: ${model.position.x}, y: ${model.position.y} },
+      rotation: ${model.rotation}
+    }`
+      )
+      .join(",\n    ");
+
     const formattedOutput = `export default {
   walls: [
     ${walls
@@ -55,7 +70,10 @@ const ExportLevel: React.FC<ExportLevelProps> = ({ lines, thickness }) => {
     }`
       )
       .join(",\n    ")}
- ]
+  ],
+  models: [
+    ${formattedModels}
+  ]
 };`;
 
     setOutput(formattedOutput);
