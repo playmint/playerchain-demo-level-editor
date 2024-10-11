@@ -298,7 +298,7 @@ function App() {
           </div>
         </div>
         <div className="general-container">
-          <label className="cube-width-label">Spawn Radius:</label>
+          <label className="cube-width-label">Spawn Circle:</label>
           <input
             type="number"
             value={radius}

@@ -32,13 +32,13 @@ Try it out here: https://playmint.github.io/playerchain-demo-level-editor/
 
 - **[ [ ]**: Decrease wall thickness.
 - **[ ] ]**: Increase wall thickness.
-- **[Slider/Input Box]**: Adjust the spawn radius value.
+- **[Slider/Input Box]**: Adjust the spawn circle value.
 
 ## Features
 
 - **Mirror Mode**: Use the `m` key or the checkbox in the sidebar to mirror your lines across all four quadrants.
 - **Wall Thickness Adjustment**: Modify the thickness of the walls using `[ ]` keys or the sidebar controls.
-- **Spawn Radius**: Adjust the spawn radius using the slider or input box in the sidebar.
+- **Spawn Circle**: Adjust the spawn circle using the slider or input box in the sidebar.
 - **Import/Export**: Easily import and export your line configurations.
 
 ## Exporting Maps
