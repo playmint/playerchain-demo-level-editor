@@ -50,3 +50,5 @@ Try it out here: https://playmint.github.io/playerchain-demo-level-editor/
 - **Enable Audio Checkbox**: 🍔
 
 ---
+
+Try our Playerchain Demo here: https://github.com/playmint/playerchain-demo
