@@ -1,6 +1,6 @@
-# Playerchain Demo Map Editor
+# Playerchain Demo Level Editor
 
-Try it out here: https://playmint.github.io/substream-map-editor/
+Try it out here: https://playmint.github.io/playerchain-demo-level-editor/
 
 ## Controls
 
