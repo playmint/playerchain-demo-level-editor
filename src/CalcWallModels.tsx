@@ -48,38 +48,40 @@ const CalcWallModels: React.FC<CalcWallModelsProps> = ({
       const isStartDiagonal =
         Math.abs(line[1].x - line[0].x) === Math.abs(line[1].y - line[0].y);
 
-      // Place end cap at the start
-      const startRotation = Math.atan2(
-        line[1].y - line[0].y,
-        line[1].x - line[0].x
-      );
-
-      placeWall(
-        wallEndCap,
-        start,
-        startRotation,
-        "wallEndCap",
-        Math.PI / (isStartDiagonal ? 1.33333 : 2)
-      );
+      // Place end cap at the start if start is not the same as end
+      if (!start.equals(end)) {
+        const startRotation = Math.atan2(
+          line[1].y - line[0].y,
+          line[1].x - line[0].x
+        );
+        placeWall(
+          wallEndCap,
+          start,
+          startRotation,
+          "wallEndCap",
+          Math.PI / (isStartDiagonal ? 1.33333 : 2)
+        );
+      }
 
       // Determine if the end end cap is on a diagonal wall
       const isEndDiagonal =
         Math.abs(line[line.length - 1].x - line[line.length - 2].x) ===
         Math.abs(line[line.length - 1].y - line[line.length - 2].y);
 
-      // Place end cap at the end
-      const endRotation = Math.atan2(
-        line[line.length - 1].y - line[line.length - 2].y,
-        line[line.length - 1].x - line[line.length - 2].x
-      );
-
-      placeWall(
-        wallEndCap,
-        end,
-        endRotation + Math.PI,
-        "wallEndCap",
-        Math.PI / (isEndDiagonal ? 4 : 2)
-      );
+      // Place end cap at the end if start is not the same as end
+      if (!start.equals(end)) {
+        const endRotation = Math.atan2(
+          line[line.length - 1].y - line[line.length - 2].y,
+          line[line.length - 1].x - line[line.length - 2].x
+        );
+        placeWall(
+          wallEndCap,
+          end,
+          endRotation + Math.PI,
+          "wallEndCap",
+          Math.PI / (isEndDiagonal ? 4 : 2)
+        );
+      }
 
       for (let i = 0; i < line.length - 1; i++) {
         const start = new THREE.Vector3(...line[i]);
